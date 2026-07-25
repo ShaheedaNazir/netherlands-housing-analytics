@@ -1,6 +1,6 @@
----Measure query performance for regional population lookups---
-
 USE NetherlandsHousingAnalytics;
+
+---Measure query performance for regional population lookups---
 
 SET STATISTICS IO ON;
 SET STATISTICS TIME ON;
