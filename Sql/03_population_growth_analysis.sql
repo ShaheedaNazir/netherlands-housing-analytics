@@ -1,6 +1,12 @@
-USE NetherlandsHousingAnalytics;
----Calculate population growth with LAG()--
+-- Project: Netherlands Housing Analytics
+-- File: 03_population_growth_analysis.sql
+-- Purpose: Analyze annual population growth, rank regions by growth,
+--          and create reusable analytical and data-quality views.
+-- Database: Microsoft SQL Server
 
+USE NetherlandsHousingAnalytics;
+
+-- Compare each region's population with the previous reporting year.
 SELECT
     region_name,
     year_value,
@@ -19,8 +25,7 @@ ORDER BY
     region_name,
     year_value;
 
----Calculate population growth percentage---
-
+-- Calculate annual population change as both an absolute value and percentage.
 SELECT
     region_name,
     year_value,
@@ -59,8 +64,7 @@ ORDER BY
     region_name,
     year_value;
 
----Rank regions by growth---
-
+-- Rank regions by annual population growth percentage within each year.
 WITH population_growth AS (
     SELECT
         region_name,
@@ -95,8 +99,7 @@ ORDER BY
     year_value,
     growth_rank;
 
----Save this as a reusable view---
-
+-- Create a reusable analytical view for annual population growth rankings.
 CREATE OR ALTER VIEW analytics.vw_population_growth_rank AS
 WITH population_growth AS (
     SELECT
@@ -129,13 +132,14 @@ SELECT
 FROM population_growth
 WHERE previous_year_population IS NOT NULL;
 
-
+-- Review the population growth ranking view.
 SELECT *
 FROM analytics.vw_population_growth_rank
-ORDER BY year_value, growth_rank;
+ORDER BY
+    year_value,
+    growth_rank;
 
----Confirm the view exists---
-
+-- Confirm that the analytical view exists in the analytics schema.
 SELECT
     TABLE_SCHEMA,
     TABLE_NAME
@@ -143,9 +147,7 @@ FROM INFORMATION_SCHEMA.VIEWS
 WHERE TABLE_SCHEMA = 'analytics'
   AND TABLE_NAME = 'vw_population_growth_rank';
 
-
----Add a data quality check--- 
-
+-- Identify duplicate records for the same region and reporting year.
 SELECT
     region_name,
     year_value,
@@ -156,8 +158,7 @@ GROUP BY
     year_value
 HAVING COUNT(*) > 1;
 
----checking for missing values---
-
+-- Identify records containing missing population values.
 SELECT *
 FROM staging.population_summary
 WHERE
@@ -167,8 +168,7 @@ WHERE
     OR male_population IS NULL
     OR female_population IS NULL;
 
----Checking whether men + women equals total population---
-
+-- Identify records where male and female totals do not match total population.
 SELECT
     region_name,
     year_value,
@@ -179,8 +179,7 @@ SELECT
 FROM staging.population_summary
 WHERE total_population <> male_population + female_population;
 
----Save these checks as a reusable view---
-
+-- Create a reusable view that combines the main population data-quality checks.
 CREATE OR ALTER VIEW quality.vw_population_data_issues AS
 
 SELECT
@@ -216,7 +215,6 @@ SELECT
 FROM staging.population_summary
 WHERE total_population <> male_population + female_population;
 
+-- Review all detected population data-quality issues.
 SELECT *
 FROM quality.vw_population_data_issues;
-
-
