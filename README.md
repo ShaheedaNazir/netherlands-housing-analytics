@@ -75,3 +75,15 @@ staging.population_summary
 analytics views and stored procedures
     ↓
 reporting and analysis
+
+## Streamlit Dashboard
+
+The project includes an interactive Streamlit dashboard built on top of the SQL Server analytical layer.
+
+### 2024 Dashboard
+
+![Streamlit dashboard 2024](Docs/streamlit_dashboard_2024.jpeg)
+
+### 2025 Dashboard
+
+![Streamlit dashboard 2025](Docs/streamlit_dashboard_2025.jpeg)
